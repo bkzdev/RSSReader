@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+	<appenders>
+		<Console name="console">
+			<PatternLayout pattern="%-5level [%t]: %msg%n%ex"></PatternLayout></Console></appenders>
+	<loggers>
+		<root level="debug">
+			<appender-ref ref="console"></appender-ref></root></loggers></configuration>
