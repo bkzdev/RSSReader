@@ -17,12 +17,12 @@ public class DataBase {
 
 	public void db(ArrayList<RSS> rssList){
 		Connection conn = null;
-		String url = "jdbc:postgresql://localhost:5432/rssdb";
-		String user = "testuser";
-		String password = "testpass";
+		String url = "jdbc:sqlserver://localhost\\SQLEXPRESS;database=rssdb;";
+		String user = "sa";
+		String password = "sdd@0913";
 
 		try {
-			Class.forName("org.postgresql.Driver").newInstance();
+			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver").newInstance();
 			conn = DriverManager.getConnection(url, user, password);
 
 			String selectSql = "select link from rsstable where link = ?";

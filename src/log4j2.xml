@@ -1,8 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<configuration>
+<configuration status="off">
+	<!-- プロパティ定義 -->
+	<Properties>
+	    <Property name="loglayout">[%d{yyyy-MM-dd HH:mm:ss.SSS}], %-5p, %m, [%t], [%c]%n</Property>
+	</Properties>
+	<!-- ログの出力先とフォーマットを設定 -->
 	<appenders>
 		<Console name="console">
-			<PatternLayout pattern="%-5level [%t]: %msg%n%ex"></PatternLayout></Console></appenders>
+			<PatternLayout pattern="${loglayout}" />
+		</Console>
+	</appenders>
+	<!-- パッケージごとにAppenderとログレベルを組み合わせる？ -->
 	<loggers>
 		<root level="debug">
-			<appender-ref ref="console"></appender-ref></root></loggers></configuration>
+			<appender-ref ref="console" />
+		</root>
+	</loggers>
+</configuration>

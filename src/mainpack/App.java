@@ -14,23 +14,30 @@ import java.util.Timer;
 
 import javax.imageio.ImageIO;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * タスクトレイ常駐アプリサンプル
  */
 public class App {
+	//ログ
+	private static final Logger LOG = LogManager.getLogger(TimerTask.class);
 
 	/** コンストラクタ */
 	public App() throws IOException, AWTException {
+		LOG.info("App startup start.");
 
 		// タスクトレイアイコン
 		Image image = ImageIO.read(
-				getClass().getResourceAsStream("trayicon.png"));
+				getClass().getResourceAsStream("/trayicon.png"));
 		final TrayIcon icon = new TrayIcon(image);
 		icon.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+
 				icon.displayMessage("アイコンクリック",
-						"アイコンがダブルクリックされました",
+						"アイコンがダブルクリックされました"+e,
 						MessageType.WARNING);
 			}
 		});
@@ -69,6 +76,8 @@ public class App {
 		// タイマー起動
 		Timer timer = new Timer();
 		timer.scheduleAtFixedRate(task, 0, 1 * 60 * 1000); // 1分ごと
+
+		LOG.info("App startup fin.");
 	}
 
 	/** メインメソッド */

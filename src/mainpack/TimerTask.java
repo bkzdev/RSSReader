@@ -9,6 +9,8 @@ import org.apache.logging.log4j.Logger;
 
 public class TimerTask extends java.util.TimerTask {
 
+	private static final String RSS_URL= "http://www.4gamer.net/rss/index.xml";
+
 	//ログ
 	private static final Logger LOG = LogManager.getLogger(TimerTask.class);
 
@@ -25,31 +27,32 @@ public class TimerTask extends java.util.TimerTask {
 
 	@Override
 	public void run() {
-		RSS_Test rss_test = new RSS_Test();
+		RSSRead rssRead = new RSSRead(RSS_URL);
 		DataBase db = new DataBase();
 
 		//RSS読み込み
-		ArrayList<RSS> rssList = rss_test.readRSS();
+		String rssTitle = rssRead.getTitle();
+		ArrayList<RSS> rssList = rssRead.getRssList();
 
 		//DB接続
 		db.db(rssList);
 
 		//新着表示
-		String mes = "";
 		boolean flag = true;
 
 		for(RSS rss:rssList){
 			if(rss.isNewTitle()){
 				flag = false;
-				mes = rss.getTitle();
-				icon.displayMessage("タイマー",
-						mes, MessageType.INFO);
+				String mes = rss.getTitle();
+				icon.displayMessage(rssTitle, mes, MessageType.INFO);
 				LOG.info("update:" + mes);
 
 			}
 		}
 
 		if(flag){
+//			icon.displayMessage("タイマー", "no update.", MessageType.INFO);
+
 			LOG.info("no update.");
 		}
 

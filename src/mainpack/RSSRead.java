@@ -7,26 +7,34 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 
-public class RSS_Test {
+public class RSSRead {
 
-	private static final String RSS_URL= "http://www.4gamer.net/rss/index.xml";
+	//ログ
+	private static final Logger LOG = LogManager.getLogger(RSSRead.class);
 
-	public ArrayList<RSS> readRSS() {
+	private ArrayList<RSS> rssList = null;;
+	private String rssUrl  = null;
+	private String title = null;
 
-		//RSSリスト作成
-		ArrayList<RSS> rssList = new ArrayList<RSS>();
+	public RSSRead(String rssUrl) {
+
+		this.rssUrl = rssUrl;
+		rssList = new ArrayList<RSS>();
 
 		try {
 
+			// RSSを読み込む
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = factory.newDocumentBuilder();
-			Document document = builder.parse(RSS_URL);
+			Document document = builder.parse(this.rssUrl);
 
 			// ドキュメントのルートを取得
 			Element root = document.getDocumentElement();
@@ -35,10 +43,8 @@ public class RSS_Test {
 			NodeList channel = root.getElementsByTagName("channel");
 
 			// "channel"直下の"title"に含まれるノードリストを取得
-			NodeList title = ((Element)channel.item(0)).getElementsByTagName("title");
-
-			// とりあえず出力する
-//			System.out.println("タイトル：\r\n" + title.item(0).getFirstChild().getNodeValue() + "\r\n");
+			title = ((Element)channel.item(0)).getElementsByTagName("title").item(0).getFirstChild().getNodeValue();
+			LOG.info("[" + title + "]読込開始");
 
 			// 各"item"とその中の"title"と"description"を取得する。
 			NodeList item_list = root.getElementsByTagName("item");
@@ -69,14 +75,14 @@ public class RSS_Test {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return rssList;
-
 	}
-	public static void main(String[] args){
-		RSS_Test rss_test = new RSS_Test();
-		DataBase db = new DataBase();
-		ArrayList<RSS> rssList = rss_test.readRSS();
-		db.db(rssList);
+
+	public ArrayList<RSS> getRssList() {
+		return rssList;
+	}
+
+	public String getTitle() {
+		return title;
 	}
 
 }
