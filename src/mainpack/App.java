@@ -22,7 +22,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class App {
 	//ログ
-	private static final Logger LOG = LogManager.getLogger(TimerTask.class);
+	private static final Logger LOG = LogManager.getLogger(App.class);
 
 	/** コンストラクタ */
 	public App() throws IOException, AWTException {

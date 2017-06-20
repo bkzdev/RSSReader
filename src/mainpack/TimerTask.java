@@ -28,14 +28,13 @@ public class TimerTask extends java.util.TimerTask {
 	@Override
 	public void run() {
 		RSSRead rssRead = new RSSRead(RSS_URL);
-		DataBase db = new DataBase();
 
 		//RSS読み込み
 		String rssTitle = rssRead.getTitle();
 		ArrayList<RSS> rssList = rssRead.getRssList();
 
 		//DB接続
-		db.db(rssList);
+		DataBase.db(rssList);
 
 		//新着表示
 		boolean flag = true;

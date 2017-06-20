@@ -15,11 +15,11 @@ public class DataBase {
 	//ログ
 	private static final Logger LOG = LogManager.getLogger(DataBase.class);
 
-	public void db(ArrayList<RSS> rssList){
+	public static void db(ArrayList<RSS> rssList){
 		Connection conn = null;
 		String url = "jdbc:sqlserver://localhost\\SQLEXPRESS;database=rssdb;";
-		String user = "sa";
-		String password = "sdd@0913";
+		String user = "rssuser";
+		String password = "rssuser";
 
 		try {
 			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver").newInstance();

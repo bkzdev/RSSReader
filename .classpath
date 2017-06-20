@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
-	<classpathentry kind="lib" path="lib/apache-log4j-2.8.2-bin/log4j-api-2.8.2.jar"/>
+	<classpathentry kind="lib" path="lib/apache-log4j-2.8.2-bin/log4j-api-2.8.2.jar" sourcepath="C:/Users/nagata/AppData/Local/Temp/decompiler/source/log4j-api-2.8.2-sources.jar"/>
 	<classpathentry kind="lib" path="lib/apache-log4j-2.8.2-bin/log4j-core-2.8.2.jar"/>
 	<classpathentry kind="lib" path="lib/Microsoft JDBC Driver 6.0 for SQL Server/sqljdbc_6.0/jpn/jre8/sqljdbc42.jar"/>
 	<classpathentry kind="output" path="bin"/>
