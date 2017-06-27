@@ -42,6 +42,7 @@ public class App {
 			}
 		});
 
+
 		// ポップアップメニュー
 		PopupMenu menu = new PopupMenu();
 		// メニューの例
@@ -49,9 +50,9 @@ public class App {
 		aItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				icon.displayMessage("メニューの例",
-						"メニューが選択されました",
-						MessageType.ERROR);
+				Swing frame = new Swing("タイトル");
+				frame.setVisible(true);
+				// icon.displayMessage("メニューの例", "メニューが選択されました", MessageType.ERROR);
 			}
 		});
 		// 終了メニュー

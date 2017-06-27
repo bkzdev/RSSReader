@@ -1,4 +1,4 @@
-package testswingpack;
+package mainpack;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -10,6 +10,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.WindowConstants;
 
 /**
  * https://www.javadrive.jp/tutorial/jframe/index1.html
@@ -18,7 +19,7 @@ import javax.swing.JTable;
  * https://www.javadrive.jp/tutorial/jframe/index4.html
  * https://www.javadrive.jp/tutorial/jframe/index5.html
  */
-class SwingTest1 extends JFrame{
+class Swing extends JFrame{
 
 	private String[][] tabledata = {
 			{"1-1","1-2","1-3","1-4"},
@@ -30,7 +31,7 @@ class SwingTest1 extends JFrame{
 	private String[] columnNames = {"A", "B", "C", "D"};
 
 	//コンストラクタ
-	SwingTest1(String title){
+	Swing(String title){
 		try {
 			setTitle(title);
 
@@ -41,7 +42,8 @@ class SwingTest1 extends JFrame{
 			setBounds(200, 200, 400, 320);
 
 			//バツで閉じる
-			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			//setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);	//java自体を終了する
+			setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);	//フレームを隠して破棄する
 
 			//ContentPaneの取得
 			//Container contentPane = getContentPane();
@@ -78,7 +80,7 @@ class SwingTest1 extends JFrame{
 	}
 
 	public static void main(String args[]){
-		SwingTest1 frame = new SwingTest1("タイトル");
+		Swing frame = new Swing("タイトル");
 
 		//表示
 		frame.setVisible(true);
