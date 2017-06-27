@@ -44,7 +44,7 @@ public class RSSRead {
 
 			// "channel"直下の"title"に含まれるノードリストを取得
 			title = ((Element)channel.item(0)).getElementsByTagName("title").item(0).getFirstChild().getNodeValue();
-			LOG.info("[" + title + "]読込開始");
+			LOG.debug("[" + title + "]読込開始");
 
 			// 各"item"とその中の"title"と"description"を取得する。
 			NodeList item_list = root.getElementsByTagName("item");

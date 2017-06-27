@@ -52,7 +52,7 @@ public class TimerTask extends java.util.TimerTask {
 		if(flag){
 //			icon.displayMessage("タイマー", "no update.", MessageType.INFO);
 
-			LOG.info("no update.");
+			LOG.debug("no update.");
 		}
 
 	}

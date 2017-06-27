@@ -5,7 +5,9 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,12 +27,19 @@ public class DataBase {
 			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver").newInstance();
 			conn = DriverManager.getConnection(url, user, password);
 
-			String selectSql = "select link from rsstable where link = ?";
-			String insertSql = "insert into rsstable (title, description, link, date) values (?, ?, ?, ?)";
+			// SELECTのSQL
+			// TODO: SELECTは1回にしたい
+			String selectSql = "select link from rssTable where link = ?";
 			PreparedStatement selectPstmt = conn.prepareStatement(selectSql);
+
+			// INSERTのSQL
+			String insertSql = "insert into rssTable (title, description, link, date, updatedate) values (?, ?, ?, ?, ?)";
 			PreparedStatement insertPstmt = conn.prepareStatement(insertSql);
 
-			//SQLの数だけ回す
+			// 現在の時刻を取得
+			String nowDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(Calendar.getInstance().getTime());
+
+			// RSSの数だけ回す
 			for(RSS rss : rssList){
 				selectPstmt.setString(1, rss.getLink());
 				ResultSet rs = selectPstmt.executeQuery();
@@ -40,15 +49,17 @@ public class DataBase {
 					insertPstmt.setString(2, rss.getDescription());
 					insertPstmt.setString(3, rss.getLink());
 					insertPstmt.setString(4, rss.getDate());
+					insertPstmt.setString(5, nowDate);
 
 					insertPstmt.executeUpdate();
 
-					LOG.info("add:" + rss.getLink());
+					LOG.debug("add:" + rss.getLink());
 
 					rss.setNewTitle(true);
 				}
 				rs.close();
 			}
+
 			selectPstmt.close();
 			insertPstmt.close();
 
