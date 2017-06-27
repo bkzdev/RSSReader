@@ -5,23 +5,27 @@ import javax.swing.JFrame;
 /**
  * https://www.javadrive.jp/tutorial/jframe/index1.html
  */
-public class SwingTest1 {
+class SwingTest1 extends JFrame{
+
+	//コンストラクタ
+	SwingTest1(String title){
+		setTitle(title);
+
+		//サイズ変更(バー含むサイズ)
+		//frame.setSize(100, 80);
+
+		//フレームの位置
+		setBounds(200, 200, 400, 320);
+
+		//バツで閉じる
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}
+
 	public static void main(String args[]){
-		JFrame frame = new JFrame("タイトル");
+		SwingTest1 frame = new SwingTest1("タイトル");
 
 		//表示
 		frame.setVisible(true);
-
-		//サイズ変更(バー含むサイズ)
-		frame.setSize(100, 80);
-
-		//フレームの位置
-		frame.setBounds(200, 200, 100, 80);
-
-		//ウインドウの位置(サイズ決めてから使う)
-		frame.setLocationRelativeTo(null);		//nullで画面中央
-
-		//バツで閉じる
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
+
 }
