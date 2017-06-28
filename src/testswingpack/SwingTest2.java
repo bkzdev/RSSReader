@@ -2,9 +2,21 @@ package testswingpack;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -12,24 +24,17 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.WindowConstants;
+import javax.swing.table.DefaultTableModel;
 
 /**
- * https://www.javadrive.jp/tutorial/jframe/index1.html
- * https://www.javadrive.jp/tutorial/jframe/index2.html
- * https://www.javadrive.jp/tutorial/jframe/index3.html
- * https://www.javadrive.jp/tutorial/jframe/index4.html
- * https://www.javadrive.jp/tutorial/jframe/index5.html
+ * http://yamato-java.blogspot.jp/2011/09/blog-post_8517.html
  */
 class SwingTest2 extends JFrame{
 
-	private String[][] tabledata = {
-			{"1-1","1-2","1-3","1-4"},
-			{"2-1","2-2","2-3","2-4"},
-			{"3-1","3-2","3-3","3-4"},
-			{"4-1","4-2","4-3","4-4"}
-	};
+	private String[] columnNames = {"記事タイトル", "配信日時"};
 
-	private String[] columnNames = {"A", "B", "C", "D"};
+	private List<Map<String, String>> rsList;
+
 
 	//コンストラクタ
 	SwingTest2(String title){
@@ -64,19 +69,32 @@ class SwingTest2 extends JFrame{
 			add(panel1,BorderLayout.NORTH);
 			add(panel2,BorderLayout.SOUTH);
 
-			//テーブルの設定
-			JTable table = new JTable(tabledata,columnNames);
-			table.setDefaultEditor(Object.class, null);		//編集不可
+			DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
 
+			//テーブルの設定
+			JTable table = new JTable(tableModel);
+			table.setDefaultEditor(Object.class, null);		//編集不可
+			database(tableModel);
 			//テーブルのイベント
 			table.addMouseListener(new java.awt.event.MouseAdapter() {
 				public void mouseClicked(MouseEvent e) {
 					if(e.getClickCount() == 2){		//ダブルクリック時
 					// 選択行の行番号を取得します
 					int row = table.getSelectedRow();
-					int col = table.getSelectedColumn();
+					String link = (String) rsList.get(row).get("link");
+					Desktop desktop = Desktop.getDesktop();
+					try {
+						URI uri = new URI(link);
+						desktop.browse(uri);
+					} catch (URISyntaxException e1) {
+						// TODO 自動生成された catch ブロック
+						e1.printStackTrace();
+					} catch (IOException e1) {
+						// TODO 自動生成された catch ブロック
+						e1.printStackTrace();
+					}
 
-					System.out.println("行" + row + "::" + "列" + col);
+					System.out.println("行" + row + "::" + "列" + link);
 					}
 				}
 			});
@@ -96,6 +114,56 @@ class SwingTest2 extends JFrame{
 		}
 
 	}
+
+	private void database(DefaultTableModel tableModel){
+		Connection conn = null;
+		String url = "jdbc:sqlserver://localhost\\SQLEXPRESS;database=rssdb;";
+		String user = "rssuser";
+		String password = "rssuser";
+
+		try {
+			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver").newInstance();
+			conn = DriverManager.getConnection(url, user, password);
+
+			// SELECTのSQL
+			// TODO: SELECTは1回にしたい
+			String selectSql = "select testview.タイトル, testview.URL, testview.配信日時 from rssdb.dbo.testview order by testview.配信日時 desc";
+			PreparedStatement selectPstmt = conn.prepareStatement(selectSql);
+			ResultSet rs = selectPstmt.executeQuery();
+
+			rsList = new ArrayList<Map<String, String>>();
+
+			// Resultの数だけ回す
+			while(rs.next()){
+
+				String title = rs.getString("タイトル");
+				String link = rs.getString("url");
+				String date = rs.getString("配信日時");
+
+				Map<String, String> map = new HashMap<>();
+				map.put("title", title);
+				map.put("link", link);
+				map.put("date", date);
+				rsList.add(map);
+
+				String[] s = {title, date};
+				tableModel.addRow(s);
+
+			}
+
+			rs.close();
+			selectPstmt.close();
+
+		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
+
+	}
+
 
 	public static void main(String args[]){
 		SwingTest2 frame = new SwingTest2("タイトル");

@@ -6,7 +6,6 @@ import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
-import java.awt.TrayIcon.MessageType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -27,6 +26,7 @@ public class App {
 	/** コンストラクタ */
 	public App() throws IOException, AWTException {
 		LOG.info("App startup start.");
+		Swing frame = new Swing("タイトル");
 
 		// タスクトレイアイコン
 		Image image = ImageIO.read(
@@ -35,10 +35,7 @@ public class App {
 		icon.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
-				icon.displayMessage("アイコンクリック",
-						"アイコンがダブルクリックされました"+e,
-						MessageType.WARNING);
+				frame.setVisible(true);
 			}
 		});
 
@@ -50,9 +47,7 @@ public class App {
 		aItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Swing frame = new Swing("タイトル");
 				frame.setVisible(true);
-				// icon.displayMessage("メニューの例", "メニューが選択されました", MessageType.ERROR);
 			}
 		});
 		// 終了メニュー
