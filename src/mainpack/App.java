@@ -35,6 +35,7 @@ public class App {
 		icon.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				frame.database();
 				frame.setVisible(true);
 			}
 		});

@@ -38,6 +38,7 @@ class Swing extends JFrame{
 	private String[] columnNames = {"記事タイトル", "配信日時"};
 
 	private List<Map<String, String>> rsList;
+	private DefaultTableModel tableModel;
 
 	//コンストラクタ
 	Swing(String title){
@@ -72,12 +73,12 @@ class Swing extends JFrame{
 			add(panel1,BorderLayout.NORTH);
 			add(panel2,BorderLayout.SOUTH);
 
-			DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+			tableModel = new DefaultTableModel(columnNames, 0);
 
 			//テーブルの設定
 			JTable table = new JTable(tableModel);
 			table.setDefaultEditor(Object.class, null);		//編集不可
-			database(tableModel);
+			database();
 			//テーブルのイベント
 			table.addMouseListener(new java.awt.event.MouseAdapter() {
 				public void mouseClicked(MouseEvent e) {
@@ -118,7 +119,7 @@ class Swing extends JFrame{
 
 	}
 
-	private void database(DefaultTableModel tableModel){
+	public void database(){
 		Connection conn = null;
 		String url = "jdbc:sqlserver://localhost\\SQLEXPRESS;database=rssdb;";
 		String user = "rssuser";
