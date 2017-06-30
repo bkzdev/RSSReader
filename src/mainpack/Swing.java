@@ -13,9 +13,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
@@ -26,6 +24,9 @@ import javax.swing.JTable;
 import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * https://www.javadrive.jp/tutorial/jframe/index1.html
  * https://www.javadrive.jp/tutorial/jframe/index2.html
@@ -34,36 +35,42 @@ import javax.swing.table.DefaultTableModel;
  * https://www.javadrive.jp/tutorial/jframe/index5.html
  */
 class Swing extends JFrame{
+	//ログ
+	private static final Logger LOG = LogManager.getLogger(Swing.class);
 
-	private String[] columnNames = {"記事タイトル", "配信日時"};
+	private final int FRAME_WIDTH = 800;
+	private final int FRAME_HEIGHT = 600;
+	private final int SCROLL_WIDTH = FRAME_WIDTH - 50;
+	private final int SCROLL_HEIGHT = FRAME_HEIGHT - 100;
+	private final String COLUMN_NUM = "記事番号";
+	private final String COLUMN_TITLE = "記事タイトル";
+	private final String COLUMN_DATE = "配信日時";
 
-	private List<Map<String, String>> rsList;
+	private Map<String, String> linkMap;
+
 	private DefaultTableModel tableModel;
 
+	private int lastNum = 0;
+
+	private String[] columnNames = {COLUMN_NUM, COLUMN_TITLE, COLUMN_DATE};
+
 	//コンストラクタ
+	//TODO: 幅とか調整する
 	Swing(String title){
 		try {
 			setTitle(title);
 
-			//サイズ変更(バー含むサイズ)
-			//frame.setSize(100, 80);
+			//フレームの位置とサイズ
+			setBounds(200, 200, FRAME_WIDTH, FRAME_HEIGHT);
 
-			//フレームの位置
-			setBounds(200, 200, 400, 320);
-
-			//バツで閉じる
-			//setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);	//java自体を終了する
-			setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);	//フレームを隠して破棄する
-
-			//ContentPaneの取得
-			//Container contentPane = getContentPane();
-			//add(temporaryLostComponent, defaultCloseOperation);
+			//バツでフレームを隠して破棄する
+			setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
 			//アイコンの指定
 			setIconImage(ImageIO.read(
 					getClass().getResourceAsStream("/trayicon.png")));
 
-			//パネルの追加
+			//謎の帯パネル
 			JPanel panel1 = new JPanel();
 			panel1.setBackground(Color.blue);
 
@@ -73,48 +80,50 @@ class Swing extends JFrame{
 			add(panel1,BorderLayout.NORTH);
 			add(panel2,BorderLayout.SOUTH);
 
+			linkMap = new HashMap<>();
+
+			//テーブルの作成
 			tableModel = new DefaultTableModel(columnNames, 0);
+			JTable table = new JTable(tableModel);
 
 			//テーブルの設定
-			JTable table = new JTable(tableModel);
 			table.setDefaultEditor(Object.class, null);		//編集不可
-			database();
+//			table.setAutoCreateRowSorter(true);					// TODO: 新着を一番上に表示したい
+			database();	//初期値を取得
+
 			//テーブルのイベント
 			table.addMouseListener(new java.awt.event.MouseAdapter() {
 				public void mouseClicked(MouseEvent e) {
 					if(e.getClickCount() == 2){		//ダブルクリック時
-					// 選択行の行番号を取得します
-					int row = table.getSelectedRow();
-					String link = (String) rsList.get(row).get("link");
-					Desktop desktop = Desktop.getDesktop();
-					try {
-						URI uri = new URI(link);
-						desktop.browse(uri);
-					} catch (URISyntaxException e1) {
-						// TODO 自動生成された catch ブロック
-						e1.printStackTrace();
-					} catch (IOException e1) {
-						// TODO 自動生成された catch ブロック
-						e1.printStackTrace();
-					}
+						// 選択行の行番号を取得します
+						String title = (String) table.getValueAt(table.getSelectedRow(), 1);
 
-					System.out.println("行" + row + "::" + "列" + link);
+						String link = (String) linkMap.get(title);
+						Desktop desktop = Desktop.getDesktop();
+
+						try {
+							URI uri = new URI(link);
+							desktop.browse(uri);
+						} catch (IOException | URISyntaxException e1) {
+							LOG.error(e1);
+						}
+
+						LOG.info("clicked:" + link);
 					}
 				}
 			});
 
 			//スクロールペイン
 			JScrollPane sp = new JScrollPane(table);
-			sp.setPreferredSize(new Dimension(250, 70));
+			sp.setPreferredSize(new Dimension(SCROLL_WIDTH, SCROLL_HEIGHT));
 
 			JPanel panel3 = new JPanel();
 			panel3.add(sp);
 
-			add(panel3, BorderLayout.CENTER);
+			this.add(panel3, BorderLayout.CENTER);
 
 		} catch (IOException e) {
-			// TODO 自動生成された catch ブロック
-			e.printStackTrace();
+			LOG.error(e);
 		}
 
 	}
@@ -130,40 +139,37 @@ class Swing extends JFrame{
 			conn = DriverManager.getConnection(url, user, password);
 
 			// SELECTのSQL
-			// TODO: SELECTは1回にしたい
-			String selectSql = "select testview.タイトル, testview.URL, testview.配信日時 from rssdb.dbo.testview order by testview.配信日時 desc";
+			String selectSql = "select top (100) rssTable.num, rssTable.title, rssTable.link, rssTable.date from rssdb.dbo.rssTable where num >= ? order by rssTable.num desc;";
 			PreparedStatement selectPstmt = conn.prepareStatement(selectSql);
+			selectPstmt.setInt(1, lastNum + 1);
 			ResultSet rs = selectPstmt.executeQuery();
 
-			rsList = new ArrayList<Map<String, String>>();
+			//テーブル全行削除
+//			tableModel.setRowCount(0);
+			rs.next();
+			lastNum = rs.getInt("num");
 
 			// Resultの数だけ回す
-			while(rs.next()){
+			do{
+				String num   = rs.getString("num");
+				String title = rs.getString("title");
+				String link  = rs.getString("link");
+				String date  = rs.getString("date");
 
-				String title = rs.getString("タイトル");
-				String link = rs.getString("url");
-				String date = rs.getString("配信日時");
+				//タイトルからリンクを取得できるよう登録
+				linkMap.put(title, link);
 
-				Map<String, String> map = new HashMap<>();
-				map.put("title", title);
-				map.put("link", link);
-				map.put("date", date);
-				rsList.add(map);
-
-				String[] s = {title, date};
+				//1行追加
+				String[] s = {num, title, date};
 				tableModel.addRow(s);
 
-			}
+			} while(rs.next());
 
 			rs.close();
 			selectPstmt.close();
 
-		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-			// TODO 自動生成された catch ブロック
-			e.printStackTrace();
-		} catch (SQLException e) {
-			// TODO 自動生成された catch ブロック
-			e.printStackTrace();
+		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | SQLException e) {
+			LOG.error(e);
 		}
 
 	}

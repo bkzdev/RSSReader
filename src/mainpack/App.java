@@ -40,7 +40,6 @@ public class App {
 			}
 		});
 
-
 		// ポップアップメニュー
 		PopupMenu menu = new PopupMenu();
 		// メニューの例

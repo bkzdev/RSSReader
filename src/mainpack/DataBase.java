@@ -3,7 +3,6 @@ package mainpack;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -27,48 +26,53 @@ public class DataBase {
 			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver").newInstance();
 			conn = DriverManager.getConnection(url, user, password);
 
-			// SELECTのSQL
-			// TODO: SELECTは1回にしたい
-			String selectSql = "select link from rssTable where link = ?";
-			PreparedStatement selectPstmt = conn.prepareStatement(selectSql);
-
 			// INSERTのSQL
-			String insertSql = "insert into rssTable (title, description, link, date, updatedate) values (?, ?, ?, ?, ?)";
+			String insertSql = "insert into rssTable (title, description, link, date, updatedate, num) values (?, ?, ?, ?, ?, (select max(rssTable.num)+1 from rssdb.dbo.rssTable))";
 			PreparedStatement insertPstmt = conn.prepareStatement(insertSql);
 
 			// 現在の時刻を取得
 			String nowDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(Calendar.getInstance().getTime());
 
-			// RSSの数だけ回す
-			for(RSS rss : rssList){
-				selectPstmt.setString(1, rss.getLink());
-				ResultSet rs = selectPstmt.executeQuery();
+			int i = 0;
 
-				if(!rs.next()){
-					insertPstmt.setString(1, rss.getTitle());
-					insertPstmt.setString(2, rss.getDescription());
-					insertPstmt.setString(3, rss.getLink());
-					insertPstmt.setString(4, rss.getDate());
-					insertPstmt.setString(5, nowDate);
-
-					insertPstmt.executeUpdate();
-
-					LOG.debug("add:" + rss.getLink());
-
-					rss.setNewTitle(true);
+			//前回の最終Linkまで空回りさせる
+			String oldLink = TimerTask.getOldLink();
+			if(!oldLink.equals("")){
+				while((i < rssList.size()) && !(oldLink.equals( rssList.get(i).getLink()))){
+					i++;
 				}
-				rs.close();
+				i++;
 			}
 
-			selectPstmt.close();
+			// RSSの数だけ回す
+			while(i < rssList.size()){
+				RSS rss = rssList.get(i);
+
+				insertPstmt.setString(1, rss.getTitle());
+				insertPstmt.setString(2, rss.getDescription());
+				insertPstmt.setString(3, rss.getLink());
+				insertPstmt.setString(4, rss.getDate());
+				insertPstmt.setString(5, nowDate);
+
+				int result = -1;
+				try{
+					result = insertPstmt.executeUpdate();
+				}catch (SQLException e1) {
+					LOG.error(e1);
+				}
+
+				LOG.debug("add:" + rss.getLink());
+				LOG.debug("result:" + result);
+				if(result > 0){
+					rss.setNewTitle(true);
+				}
+				i++;
+			}
+
 			insertPstmt.close();
 
-		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-			// TODO 自動生成された catch ブロック
-			e.printStackTrace();
-		} catch (SQLException e) {
-			// TODO 自動生成された catch ブロック
-			e.printStackTrace();
+		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | SQLException e) {
+			LOG.error(e);
 		}
 
 	}

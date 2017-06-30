@@ -2,6 +2,7 @@ package mainpack;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -67,6 +68,9 @@ public class RSSRead {
 				rssList.add(new RSS(item_title, item_description, item_link, item_date));
 
 			}
+
+			//リストを逆順(昇順)にする
+			Collections.reverse(rssList);
 
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();

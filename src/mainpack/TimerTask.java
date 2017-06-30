@@ -14,6 +14,9 @@ public class TimerTask extends java.util.TimerTask {
 	//ログ
 	private static final Logger LOG = LogManager.getLogger(TimerTask.class);
 
+	//前回のRSSの先頭の内容を保存しておく
+	private static String oldLink = "";
+
 	private TrayIcon icon;
 
 	@SuppressWarnings("unused")
@@ -33,15 +36,22 @@ public class TimerTask extends java.util.TimerTask {
 		String rssTitle = rssRead.getTitle();
 		ArrayList<RSS> rssList = rssRead.getRssList();
 
+		//前回取得したRSSと先頭の内容が変わってなければ中止
+		String newLink = rssList.get(rssList.size()-1).getLink();
+		if(oldLink.equals(newLink)){
+			LOG.debug("no update.");
+			return;
+		}
+
 		//DB接続
 		DataBase.db(rssList);
 
-		//新着表示
-		boolean flag = true;
+		//TODO: 新着があればすぐにswingの更新をする
+
+		oldLink = newLink;
 
 		for(RSS rss:rssList){
 			if(rss.isNewTitle()){
-				flag = false;
 				String mes = rss.getTitle();
 				icon.displayMessage(rssTitle, mes, MessageType.INFO);
 				LOG.info("update:" + mes);
@@ -49,11 +59,11 @@ public class TimerTask extends java.util.TimerTask {
 			}
 		}
 
-		if(flag){
-//			icon.displayMessage("タイマー", "no update.", MessageType.INFO);
+		return;
+	}
 
-			LOG.debug("no update.");
-		}
+	public static String getOldLink(){
+		return oldLink;
 
 	}
 
