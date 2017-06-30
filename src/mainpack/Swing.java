@@ -88,7 +88,7 @@ class Swing extends JFrame{
 
 			//テーブルの設定
 			table.setDefaultEditor(Object.class, null);		//編集不可
-//			table.setAutoCreateRowSorter(true);					// TODO: 新着を一番上に表示したい
+			table.setAutoCreateRowSorter(true);					// TODO: 新着を一番上に表示したい
 			database();	//初期値を取得
 
 			//テーブルのイベント
