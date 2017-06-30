@@ -87,10 +87,8 @@ class SwingTest2 extends JFrame{
 						URI uri = new URI(link);
 						desktop.browse(uri);
 					} catch (URISyntaxException e1) {
-						// TODO 自動生成された catch ブロック
 						e1.printStackTrace();
 					} catch (IOException e1) {
-						// TODO 自動生成された catch ブロック
 						e1.printStackTrace();
 					}
 
@@ -109,7 +107,6 @@ class SwingTest2 extends JFrame{
 			add(panel3, BorderLayout.CENTER);
 
 		} catch (IOException e) {
-			// TODO 自動生成された catch ブロック
 			e.printStackTrace();
 		}
 
@@ -126,7 +123,6 @@ class SwingTest2 extends JFrame{
 			conn = DriverManager.getConnection(url, user, password);
 
 			// SELECTのSQL
-			// TODO: SELECTは1回にしたい
 			String selectSql = "select testview.タイトル, testview.URL, testview.配信日時 from rssdb.dbo.testview order by testview.配信日時 desc";
 			PreparedStatement selectPstmt = conn.prepareStatement(selectSql);
 			ResultSet rs = selectPstmt.executeQuery();
@@ -155,10 +151,8 @@ class SwingTest2 extends JFrame{
 			selectPstmt.close();
 
 		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-			// TODO 自動生成された catch ブロック
 			e.printStackTrace();
 		} catch (SQLException e) {
-			// TODO 自動生成された catch ブロック
 			e.printStackTrace();
 		}
 

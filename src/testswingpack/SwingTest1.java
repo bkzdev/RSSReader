@@ -71,7 +71,6 @@ class SwingTest1 extends JFrame{
 			add(panel3, BorderLayout.CENTER);
 
 		} catch (IOException e) {
-			// TODO 自動生成された catch ブロック
 			e.printStackTrace();
 		}
 
